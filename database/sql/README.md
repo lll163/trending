@@ -2,6 +2,8 @@
 
 与《设计说明》一致：**业务表结构由本目录 SQL 维护**，不使用 Laravel Migration 新增业务表。框架自带的 `users` / `cache` / `jobs` 等表仍可由 Laravel 默认 Migration 创建。
 
+**方言：** 下列脚本按 **MySQL 8** 编写（`JSON` 类型等）；若使用 SQLite 仅作本地联调，需自行调整或改用 MySQL。
+
 ## 执行顺序
 
 1. （可选）在项目根目录执行 `php artisan migrate`，创建框架默认表（含 `users`）。
