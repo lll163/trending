@@ -17,6 +17,7 @@
             <directory>app</directory>
         </include>
     </source>
+    <!-- 需要 pdo_sqlite；若仅启用 pdo_mysql，可将 DB_CONNECTION/DB_DATABASE 等改为本机测试库 -->
     <php>
         <env name="APP_ENV" value="testing"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
