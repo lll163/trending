@@ -12,6 +12,26 @@ use App\Models\User;
 class SubmissionPolicy
 {
     /**
+     * 是否允许查看「我的投稿」列表。
+     */
+    public function viewAny(User $user): bool
+    {
+        return $user->github_bound_at !== null;
+    }
+
+    /**
+     * 查看单条：本人或管理员。
+     */
+    public function view(User $user, Submission $submission): bool
+    {
+        if ($user->is_admin) {
+            return true;
+        }
+
+        return (int) $user->id === (int) $submission->user_id;
+    }
+
+    /**
      * 是否允许创建投稿（不要求已存在模型实例）。
      */
     public function create(User $user): bool

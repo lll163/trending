@@ -22,6 +22,10 @@ abstract class TestCase extends BaseTestCase
             return;
         }
 
+        if (! Schema::hasTable('users')) {
+            return;
+        }
+
         if (! Schema::hasColumn('users', 'is_admin')) {
             Schema::table('users', function (Blueprint $table) {
                 $table->boolean('is_admin')->default(false);
@@ -45,6 +49,59 @@ abstract class TestCase extends BaseTestCase
                 $table->text('refresh_token')->nullable();
                 $table->timestamps();
                 $table->unique(['provider', 'provider_user_id'], 'uniq_oauth_provider_user');
+            });
+        }
+
+        if (! Schema::hasTable('repos_snapshots')) {
+            Schema::create('repos_snapshots', function (Blueprint $table) {
+                $table->id();
+                $table->string('github_owner', 255);
+                $table->string('github_repo', 255);
+                $table->text('description')->nullable();
+                $table->unsignedInteger('stars_cnt')->default(0);
+                $table->unsignedInteger('forks_cnt')->default(0);
+                $table->string('default_branch')->nullable();
+                $table->string('homepage_url', 512)->nullable();
+                $table->timestamp('pushed_at')->nullable();
+                $table->timestamp('snapshot_synced_at')->nullable();
+                $table->string('snapshot_sync_error', 500)->nullable();
+                $table->boolean('is_published')->default(true);
+                $table->timestamps();
+                $table->unique(['github_owner', 'github_repo'], 'uniq_repos_snapshots_github_coords');
+            });
+        }
+
+        if (! Schema::hasTable('submissions')) {
+            Schema::create('submissions', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('user_id');
+                $table->string('github_owner', 255);
+                $table->string('github_repo', 255);
+                $table->text('pitch')->nullable();
+                $table->string('status', 32)->default('pending_auto');
+                $table->string('reject_reason', 500)->nullable();
+                $table->unsignedBigInteger('repos_snapshot_id')->nullable();
+                $table->timestamps();
+            });
+        }
+
+        if (! Schema::hasTable('review_logs')) {
+            Schema::create('review_logs', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('submission_id');
+                $table->unsignedBigInteger('admin_user_id');
+                $table->string('action', 32);
+                $table->string('remark', 500)->nullable();
+                $table->timestamps();
+            });
+        }
+
+        if (! Schema::hasTable('blacklist_entries')) {
+            Schema::create('blacklist_entries', function (Blueprint $table) {
+                $table->id();
+                $table->string('pattern_type', 32);
+                $table->string('pattern_value', 512);
+                $table->timestamps();
             });
         }
     }

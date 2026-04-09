@@ -2,12 +2,13 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
+ * @extends Factory<User>
  */
 class UserFactory extends Factory
 {
@@ -41,4 +42,26 @@ class UserFactory extends Factory
             'email_verified_at' => null,
         ]);
     }
+
+    // AI-GEN-BEGIN
+    /**
+     * 已绑定 GitHub（用于投稿相关测试）。
+     */
+    public function withGithubBound(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'github_bound_at' => now(),
+        ]);
+    }
+
+    /**
+     * 后台管理员。
+     */
+    public function admin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_admin' => true,
+        ]);
+    }
+    // AI-GEN-END
 }

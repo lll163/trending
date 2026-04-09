@@ -15,6 +15,21 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+                    {{-- AI-GEN-BEGIN --}}
+                    @if (Auth::user()->github_bound_at)
+                        <x-nav-link :href="route('submissions.index')" :active="request()->routeIs('submissions.*')">
+                            {{ __('我的投稿') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('submissions.create')" :active="request()->routeIs('submissions.create')">
+                            {{ __('提交项目') }}
+                        </x-nav-link>
+                    @endif
+                    @if (Auth::user()->is_admin)
+                        <x-nav-link :href="route('admin.submissions.index')" :active="request()->routeIs('admin.submissions.*')">
+                            {{ __('审核队列') }}
+                        </x-nav-link>
+                    @endif
+                    {{-- AI-GEN-END --}}
                 </div>
             </div>
 
@@ -70,6 +85,21 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+            {{-- AI-GEN-BEGIN --}}
+            @if (Auth::user()->github_bound_at)
+                <x-responsive-nav-link :href="route('submissions.index')" :active="request()->routeIs('submissions.*')">
+                    {{ __('我的投稿') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('submissions.create')" :active="request()->routeIs('submissions.create')">
+                    {{ __('提交项目') }}
+                </x-responsive-nav-link>
+            @endif
+            @if (Auth::user()->is_admin)
+                <x-responsive-nav-link :href="route('admin.submissions.index')" :active="request()->routeIs('admin.submissions.*')">
+                    {{ __('审核队列') }}
+                </x-responsive-nav-link>
+            @endif
+            {{-- AI-GEN-END --}}
         </div>
 
         <!-- Responsive Settings Options -->

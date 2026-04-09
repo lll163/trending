@@ -37,7 +37,7 @@ class SubmissionCreateGateTest extends TestCase
         $response = $this->actingAs($user)->get(route('submissions.create'));
 
         $response->assertOk();
-        $response->assertSee(__('投稿表单将在后续迭代中完善。'), false);
+        $response->assertSee(__('提交审核'), false);
     }
 }
 // AI-GEN-END

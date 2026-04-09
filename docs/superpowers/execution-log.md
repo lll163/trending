@@ -2,7 +2,7 @@
 
 本文档汇总仓库内已落地的实现步骤、运行环境要求、命令与 Git 历史，便于续开发与交接。
 
-**最后更新：** 2026-04-09  
+**最后更新：** 2026-04-09（含 Chunk 3）  
 **当前开发分支：** `feature/laravel-bootstrap`（已推送远程 `origin/feature/laravel-bootstrap`）
 
 ---
@@ -35,6 +35,15 @@
 - **资料页** 含 GitHub 绑定区块：`profile.partials.github-binding-form`。
 - **`SubmissionPolicy`：** 创建/更新投稿需已绑定 GitHub；`SubmissionController@create` 与占位视图 `submissions/create`。
 - **测试：** `GitHubBindingTest`、`SubmissionCreateGateTest`；`tests/TestCase` 在 **sqlite** 下自动补 `users.is_admin`、`users.github_bound_at` 与 `oauth_accounts` 表结构（不写 DROP，与生产 SQL 语义对齐）。
+
+### Chunk 3：投稿自动规则与人工审核
+
+- **状态常量：** `App\Models\SubmissionStatus`（`pending_review`、`rejected_auto`、`approved`、`rejected_review` 等）。
+- **自动规则：** `AutoRulePipeline` + `SubmissionDraft` + `AutoRuleResult`；依赖 `EloquentDuplicateRepoChecker`、`BlacklistMatcher`；`config/submission.php` 配置推荐语关键词（`.env` 可选 `SUBMISSION_BLOCKED_KEYWORDS`）。流水线第三参数可为单测覆盖关键词（生产由容器解析为 null）。
+- **用户侧：** `GET/POST /submissions`、`SubmissionController@index|create|store`；通过规则 → `pending_review`，否则 `rejected_auto` 并写入 `reject_reason`；视图 `submissions/index`、`submissions/create`；导航栏增加「我的投稿」「提交项目」。
+- **管理侧（方案 B）：** 中间件 `admin`（`EnsureUserIsAdmin`）；`Admin\SubmissionReviewController`；路由前缀 `/admin/submissions`；通过时 `firstOrCreate` `repos_snapshots` 并写 `review_logs`；驳回时 `rejected_review` + 原因。
+- **策略：** `SubmissionPolicy` 增加 `viewAny`、`view`。
+- **测试：** `tests/Unit/SubmissionAutoRulesTest`（纯 PHPUnit，无 DB）；`SubmissionStoreFlowTest`、`AdminSubmissionReviewTest`；`tests/TestCase` 在 sqlite 下补充 `repos_snapshots`、`submissions`、`review_logs`、`blacklist_entries` 表（无 `users` 表时不执行补丁，避免纯单元测试连库）。
 
 ---
 
@@ -88,6 +97,7 @@ php artisan test tests/Unit
 - `GITHUB_CLIENT_ID`、`GITHUB_CLIENT_SECRET`
 - `GITHUB_REDIRECT_URI`：须与 GitHub OAuth App 回调一致，例如 `{APP_URL}/auth/github/callback`
 - `GITHUB_TOKEN`：后续定时同步 GitHub API 使用（可暂空）
+- `SUBMISSION_BLOCKED_KEYWORDS`：可选，逗号分隔；留空则用 `config/submission.php` 默认关键词列表
 
 ---
 
@@ -102,7 +112,13 @@ php artisan test tests/Unit
 | GET | `/profile` | profile.edit | 资料（含 GitHub 绑定） |
 | GET | `/auth/github` | github.redirect | 跳转 GitHub（需登录） |
 | GET | `/auth/github/callback` | github.callback | OAuth 回调（需登录） |
-| GET | `/submissions/create` | submissions.create | 投稿占位（需登录且已绑定 GitHub） |
+| GET | `/submissions` | submissions.index | 我的投稿列表 |
+| GET | `/submissions/create` | submissions.create | 投稿表单 |
+| POST | `/submissions` | submissions.store | 提交投稿 |
+| GET | `/admin/submissions` | admin.submissions.index | 审核队列（管理员） |
+| GET | `/admin/submissions/{id}` | admin.submissions.show | 单条审核 |
+| POST | `/admin/submissions/{id}/approve` | admin.submissions.approve | 通过 |
+| POST | `/admin/submissions/{id}/reject` | admin.submissions.reject | 驳回（需 remark） |
 
 ---
 
@@ -131,7 +147,7 @@ php artisan test tests/Unit
 
 ## 9. 后续计划（未实现）
 
-见 [实现计划](./plans/2026-04-08-hellogithub-like-implementation.md) **Chunk 3** 及之后：投稿自动规则、后台审核、标签与前台、月刊、GitHub 定时同步、榜单等。
+见 [实现计划](./plans/2026-04-08-hellogithub-like-implementation.md) **Chunk 4** 及之后：标签与前台仓库列表、月刊、GitHub 定时同步、榜单等。
 
 ---
 
@@ -140,3 +156,4 @@ php artisan test tests/Unit
 | 日期 | 说明 |
 |------|------|
 | 2026-04-09 | 初版：汇总 Chunk 1～2 执行信息、环境与 Git |
+| 2026-04-09 | 补充 Chunk 3：自动规则、投稿 CRUD、Blade 后台审核、测试与路由 |

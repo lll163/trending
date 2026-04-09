@@ -128,6 +128,8 @@
 
 ## Chunk 3：投稿自动规则与人工审核
 
+**已锁定 — 管理后台方案：** B（`routes/web.php` 中 `admin` 前缀 + `EnsureUserIsAdmin` + `Admin\SubmissionReviewController` + Blade），不使用 Filament。
+
 ### Task 3.1：自动规则服务（TDD）
 
 **Files:**

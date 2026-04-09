@@ -2,6 +2,13 @@
 
 namespace App\Providers;
 
+// AI-GEN-BEGIN
+use App\Services\Submission\AutoRulePipeline;
+use App\Services\Submission\BlacklistMatcher;
+use App\Services\Submission\Contracts\BlacklistMatcherInterface;
+use App\Services\Submission\Contracts\DuplicateRepoCheckerInterface;
+use App\Services\Submission\EloquentDuplicateRepoChecker;
+// AI-GEN-END
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -11,7 +18,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // AI-GEN-BEGIN
+        $this->app->singleton(DuplicateRepoCheckerInterface::class, EloquentDuplicateRepoChecker::class);
+        $this->app->singleton(BlacklistMatcherInterface::class, BlacklistMatcher::class);
+        $this->app->singleton(AutoRulePipeline::class);
+        // AI-GEN-END
     }
 
     /**
