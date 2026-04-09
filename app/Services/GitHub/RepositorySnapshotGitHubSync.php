@@ -26,9 +26,10 @@ final class RepositorySnapshotGitHubSync
 
         if ($result->status === GitHubRepositoryFetchStatus::Skipped) {
             Log::info('github.snapshot_sync_skipped', [
+                'component' => 'repository_snapshot_github_sync',
                 'repos_snapshot_id' => $snapshot->id,
-                'owner' => $snapshot->github_owner,
-                'repo' => $snapshot->github_repo,
+                'github_owner' => $snapshot->github_owner,
+                'github_repo' => $snapshot->github_repo,
                 'reason' => $result->message,
             ]);
 
@@ -50,10 +51,11 @@ final class RepositorySnapshotGitHubSync
         ]);
 
         Log::warning('github.snapshot_sync_failed', [
+            'component' => 'repository_snapshot_github_sync',
             'repos_snapshot_id' => $snapshot->id,
-            'owner' => $snapshot->github_owner,
-            'repo' => $snapshot->github_repo,
-            'status' => $result->status->value,
+            'github_owner' => $snapshot->github_owner,
+            'github_repo' => $snapshot->github_repo,
+            'fetch_status' => $result->status->value,
             'message' => $message,
         ]);
     }

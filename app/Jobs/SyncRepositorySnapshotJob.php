@@ -36,7 +36,11 @@ class SyncRepositorySnapshotJob implements ShouldQueue
             $sync->sync($snapshot);
         } catch (Throwable $e) {
             Log::error('github.snapshot_sync_exception', [
+                'component' => 'sync_repository_snapshot_job',
                 'repos_snapshot_id' => $this->reposSnapshotId,
+                'github_owner' => $snapshot->github_owner,
+                'github_repo' => $snapshot->github_repo,
+                'exception_class' => $e::class,
                 'message' => $e->getMessage(),
             ]);
 

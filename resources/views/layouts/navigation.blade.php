@@ -34,6 +34,11 @@
                         <x-nav-link :href="route('admin.repos-snapshots.index')" :active="request()->routeIs('admin.repos-snapshots.*')">
                             {{ __('仓库快照') }}
                         </x-nav-link>
+                        {{-- AI-GEN-BEGIN --}}
+                        <x-nav-link :href="route('admin.sync-health.index')" :active="request()->routeIs('admin.sync-health.*')">
+                            {{ __('同步失败') }}
+                        </x-nav-link>
+                        {{-- AI-GEN-END --}}
                         <x-nav-link :href="route('admin.magazine-issues.index')" :active="request()->routeIs('admin.magazine-issues.*')">
                             {{ __('月刊期号') }}
                         </x-nav-link>
@@ -116,6 +121,11 @@
                 <x-responsive-nav-link :href="route('admin.repos-snapshots.index')" :active="request()->routeIs('admin.repos-snapshots.*')">
                     {{ __('仓库快照') }}
                 </x-responsive-nav-link>
+                {{-- AI-GEN-BEGIN --}}
+                <x-responsive-nav-link :href="route('admin.sync-health.index')" :active="request()->routeIs('admin.sync-health.*')">
+                    {{ __('同步失败') }}
+                </x-responsive-nav-link>
+                {{-- AI-GEN-END --}}
                 <x-responsive-nav-link :href="route('admin.magazine-issues.index')" :active="request()->routeIs('admin.magazine-issues.*')">
                     {{ __('月刊期号') }}
                 </x-responsive-nav-link>

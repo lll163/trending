@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\MagazineIssueController;
 use App\Http\Controllers\Admin\ReposSnapshotController;
 use App\Http\Controllers\Admin\SubmissionReviewController;
+use App\Http\Controllers\Admin\SyncHealthController;
 use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Auth\GitHubController;
 use App\Http\Controllers\HomeController;
@@ -68,6 +69,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/repos-snapshots', [ReposSnapshotController::class, 'index'])->name('repos-snapshots.index');
     Route::get('/repos-snapshots/{reposSnapshot}/tags', [ReposSnapshotController::class, 'editTags'])->name('repos-snapshots.edit-tags');
     Route::put('/repos-snapshots/{reposSnapshot}/tags', [ReposSnapshotController::class, 'updateTags'])->name('repos-snapshots.update-tags');
+
+    // AI-GEN-BEGIN
+    Route::get('/sync-health', [SyncHealthController::class, 'index'])->name('sync-health.index');
+    // AI-GEN-END
 
     Route::resource('magazine-issues', MagazineIssueController::class)->except(['show']);
     Route::resource('articles', ArticleController::class)->except(['show']);

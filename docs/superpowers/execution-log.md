@@ -2,7 +2,7 @@
 
 本文档汇总仓库内已落地的实现步骤、运行环境要求、命令与 Git 历史，便于续开发与交接。
 
-**最后更新：** 2026-04-08（含 Chunk 7：榜单与首页聚合）  
+**最后更新：** 2026-04-08（含 Chunk 8：同步观测与后台摘要）  
 **当前开发分支：** `feature/laravel-bootstrap`（已推送远程 `origin/feature/laravel-bootstrap`）
 
 ---
@@ -80,6 +80,13 @@
 - **任务：** `RebuildRankingJob`；`routes/console.php` 每日 **04:00** 调度（晚于 03:00 GitHub 同步）；命令 **`php artisan ranking:rebuild`** 手动重算默认键。
 - **前台：** `HomeController@index` → `GET /`（`home`），聚合榜单预览（无物化数据时按 Star 回退）、最新 `approved` 投稿、入口链接；`RankingController@index` → `GET /rankings`、`GET /rankings/{ranking_key}`；`resources/views/home.blade.php`、`rankings/index.blade.php`（`layouts.site`）；`public-nav` 增加「榜单」。
 - **测试：** `RankingRebuildAndHomeTest`；`tests/TestCase` sqlite 补丁增加 `ranking_configs`、`ranking_entries`。
+
+### Chunk 8：观测、配置与收尾
+
+- **结构化日志：** `GitHubRepositoryClient`、`RepositorySnapshotGitHubSync`、`SyncRepositorySnapshotJob` 在失败/跳过时输出带 `component`、`github_owner`、`github_repo`（及 `http_status` / `fetch_status` / `exception_class` 等）的 `Log::warning` / `Log::error`，便于检索与聚合。
+- **配置：** `config/sync_health.php`，`.env` 可选 `SYNC_HEALTH_PER_PAGE`（默认 25，限制在 5～100）。
+- **管理端只读页：** `GET /admin/sync-health`（`admin.sync-health.index`），`SyncHealthController@index` 分页列出 `snapshot_sync_error` 非空的 `repos_snapshots`（按 `updated_at` 降序）；视图 `admin/sync_health/index`；导航「同步失败」。
+- **测试：** `AdminSyncHealthTest`（管理员可见、非管理员 403、访客重定向登录）；类级 `#[RequiresPhpExtension('pdo_sqlite')]`，无扩展时跳过，避免与 `phpunit.xml` 默认 sqlite 配置冲突。
 
 ---
 
@@ -172,6 +179,7 @@ php artisan schedule:list
 | GET | `/admin/repos-snapshots` | admin.repos-snapshots.index | 快照列表（管理员） |
 | GET | `/admin/repos-snapshots/{id}/tags` | admin.repos-snapshots.edit-tags | 编辑快照标签 |
 | PUT | `/admin/repos-snapshots/{id}/tags` | admin.repos-snapshots.update-tags | 保存快照标签 |
+| GET | `/admin/sync-health` | admin.sync-health.index | 同步失败摘要（管理员只读） |
 | GET | `/magazines` | magazines.index | 月刊列表（公开） |
 | GET | `/magazines/{issue_code}` | magazines.show | 期号目录（公开） |
 | GET | `/magazines/{issue_code}/{article_slug}` | magazines.article | 文章阅读（公开） |
@@ -185,6 +193,7 @@ php artisan schedule:list
 - **默认 `phpunit.xml`：** `DB_CONNECTION=sqlite`、`DB_DATABASE=:memory:`，需要 PHP 启用 **`pdo_sqlite`**。
 - 若仅启用 **`pdo_mysql`**：请在 `phpunit.xml`（或本地覆盖文件）中改为测试库连接，并先 `migrate` + 按需执行业务 SQL；**勿对生产库跑测试**。
 - 某次在「无 pdo_sqlite、无本机 MySQL」环境下，全量 `php artisan test` 会因无法连接数据库失败；**`tests/Unit` 可不依赖数据库刷新** 时更易通过。
+- **Chunk 8 偏差说明：** 本机验证以 `php artisan test tests/Unit` 与「含 `RequiresPhpExtension` 的 Feature 在无驱动时跳过」为准；完整 Feature 套件需在启用 `pdo_sqlite` 或配置 MySQL 测试库后执行。
 
 ---
 
@@ -198,6 +207,7 @@ php artisan schedule:list
 | `feat: Breeze 认证、GitHub 绑定与投稿门禁` | Chunk 2 |
 | `docs: 新增 HelloGitHub 类站点实现计划` | 文档 |
 | `docs: 新增 HelloGitHub 类站点设计说明（Blade 前台）` | 文档 |
+| `feat: 同步结构化日志、后台同步失败摘要与测试文档` | Chunk 8 |
 
 远程仓库：`https://github.com/lll163/trending`（默认主分支为 `master`，功能开发在 `feature/laravel-bootstrap`）。
 
@@ -205,7 +215,7 @@ php artisan schedule:list
 
 ## 9. 后续计划（未实现）
 
-见 [实现计划](./plans/2026-04-08-hellogithub-like-implementation.md) **Chunk 8** 及之后：观测与收尾等。
+[实现计划](./plans/2026-04-08-hellogithub-like-implementation.md) 中 **Chunk 1～8** 已按当前仓库落地；后续以代码评审、部署与运维（队列/日志采集、可选 Filament 等）为主，不再绑定同一计划编号。
 
 ---
 
@@ -219,3 +229,4 @@ php artisan schedule:list
 | 2026-04-08 | 补充 Chunk 5：月刊期号/文章后台、前台月刊与 Markdown 渲染、测试与路由 |
 | 2026-04-08 | 补充 Chunk 6：GitHub 客户端、快照同步 Job、console 调度与手动命令、单元测试 |
 | 2026-04-08 | 补充 Chunk 7：RankingService、RebuildRankingJob、首页与榜单页、ranking 配置与测试 |
+| 2026-04-08 | 补充 Chunk 8：同步结构化日志、后台同步失败摘要、路由与 Feature 测试（pdo_sqlite 要求说明） |

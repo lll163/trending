@@ -5,6 +5,7 @@ namespace App\Services\GitHub;
 // AI-GEN-BEGIN
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 /**
@@ -55,6 +56,14 @@ final class GitHubRepositoryClient
                 ->timeout(30)
                 ->get("https://api.github.com/repos/{$owner}/{$repo}");
         } catch (Throwable $e) {
+            Log::warning('github.api.request_exception', [
+                'component' => 'github_api_client',
+                'github_owner' => $owner,
+                'github_repo' => $repo,
+                'exception_class' => $e::class,
+                'message' => $e->getMessage(),
+            ]);
+
             return new GitHubRepositoryFetchResult(
                 GitHubRepositoryFetchStatus::Failed,
                 null,
@@ -63,6 +72,13 @@ final class GitHubRepositoryClient
         }
 
         if ($response->status() === 404) {
+            Log::warning('github.api.repo_not_found', [
+                'component' => 'github_api_client',
+                'github_owner' => $owner,
+                'github_repo' => $repo,
+                'http_status' => 404,
+            ]);
+
             return new GitHubRepositoryFetchResult(
                 GitHubRepositoryFetchStatus::NotFound,
                 null,
@@ -71,24 +87,49 @@ final class GitHubRepositoryClient
         }
 
         if ($response->status() === 403) {
+            $msg = $this->shortenErrorMessage($response->json('message') ?? '禁止访问 (403)');
+            Log::warning('github.api.forbidden', [
+                'component' => 'github_api_client',
+                'github_owner' => $owner,
+                'github_repo' => $repo,
+                'http_status' => 403,
+                'message' => $msg,
+            ]);
+
             return new GitHubRepositoryFetchResult(
                 GitHubRepositoryFetchStatus::Forbidden,
                 null,
-                $this->shortenErrorMessage($response->json('message') ?? '禁止访问 (403)'),
+                $msg,
             );
         }
 
         if (! $response->successful()) {
+            $bodySnippet = $this->shortenErrorMessage($response->body());
+            Log::warning('github.api.http_error', [
+                'component' => 'github_api_client',
+                'github_owner' => $owner,
+                'github_repo' => $repo,
+                'http_status' => $response->status(),
+                'body_snippet' => $bodySnippet,
+            ]);
+
             return new GitHubRepositoryFetchResult(
                 GitHubRepositoryFetchStatus::Failed,
                 null,
-                'HTTP '.$response->status().': '.$this->shortenErrorMessage($response->body()),
+                'HTTP '.$response->status().': '.$bodySnippet,
             );
         }
 
         /** @var array<string, mixed>|null $json */
         $json = $response->json();
         if (! is_array($json)) {
+            Log::warning('github.api.invalid_json_body', [
+                'component' => 'github_api_client',
+                'github_owner' => $owner,
+                'github_repo' => $repo,
+                'http_status' => $response->status(),
+            ]);
+
             return new GitHubRepositoryFetchResult(
                 GitHubRepositoryFetchStatus::Failed,
                 null,
