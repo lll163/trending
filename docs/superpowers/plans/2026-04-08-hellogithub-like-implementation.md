@@ -250,10 +250,10 @@
 - Create: `app/Jobs/RebuildRankingJob.php`
 - Modify: `routes/console.php`
 
-- [ ] **Step 1：** 第一版策略：按 `stars` 降序 + 更新时间过滤（可在 `ranking_configs` 存 JSON 参数）。
-- [ ] **Step 2：** 结果写入榜单结果表或缓存 Tag；前台只读缓存/表。
-- [ ] **Step 3：** 调度：在同步任务之后或独立低频任务重算（避免与同步同批锁表，采用队列）。
-- [ ] **Step 4：** 提交：`feat: 榜单计算与定时重算`。
+- [x] **Step 1：** 第一版策略：按 `stars` 降序 + 更新时间过滤（可在 `ranking_configs` 存 JSON 参数）。
+- [x] **Step 2：** 结果写入榜单结果表或缓存 Tag；前台只读缓存/表。
+- [x] **Step 3：** 调度：在同步任务之后或独立低频任务重算（避免与同步同批锁表，采用队列）。
+- [x] **Step 4：** 提交：`feat: 榜单计算与定时重算`。
 
 ### Task 7.2：首页 Blade
 
@@ -262,8 +262,8 @@
 - Modify: `resources/views/welcome.blade.php` 或新建 `home.blade.php`
 - Modify: `routes/web.php`
 
-- [ ] **Step 1：** 聚合：推荐仓库、最新通过投稿、榜单入口、月刊入口链接。
-- [ ] **Step 2：** 提交：`feat: 首页聚合展示（Blade）`。
+- [x] **Step 1：** 聚合：推荐仓库、最新通过投稿、榜单入口、月刊入口链接。
+- [x] **Step 2：** 提交：`feat: 首页聚合展示（Blade）`。
 
 ---
 

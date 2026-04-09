@@ -2,10 +2,11 @@
 <nav class="bg-white border-b border-gray-200">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
         <div class="flex items-center gap-6">
-            <a href="{{ url('/') }}" class="text-sm font-medium text-gray-700 hover:text-gray-900">{{ __('首页') }}</a>
+            <a href="{{ route('home') }}" class="text-sm font-medium text-gray-700 hover:text-gray-900">{{ __('首页') }}</a>
             <a href="{{ route('repositories.index') }}" class="text-sm font-medium text-gray-700 hover:text-gray-900">{{ __('开源仓库') }}</a>
-            {{-- AI-GEN-BEGIN --}}
             <a href="{{ route('magazines.index') }}" class="text-sm font-medium text-gray-700 hover:text-gray-900">{{ __('月刊') }}</a>
+            {{-- AI-GEN-BEGIN --}}
+            <a href="{{ route('rankings.index') }}" class="text-sm font-medium text-gray-700 hover:text-gray-900">{{ __('榜单') }}</a>
             {{-- AI-GEN-END --}}
         </div>
         <div class="flex items-center gap-4 text-sm">

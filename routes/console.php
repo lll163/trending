@@ -1,5 +1,6 @@
 <?php
 
+use App\Jobs\RebuildRankingJob;
 use App\Jobs\SyncAllRepositoriesJob;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
@@ -28,4 +29,16 @@ Artisan::command('github:sync-repository-snapshots', function (): void {
 | 生产环境可为任务链式追加 ->name('...')->withoutOverlapping()（需可用 cache 后端）。
 */
 Schedule::job(new SyncAllRepositoriesJob)->dailyAt('03:00');
+
+Artisan::command('ranking:rebuild', function (): void {
+    $key = (string) config('ranking.default_key', 'stars_public');
+    $this->info("重算榜单：{$key}");
+    RebuildRankingJob::dispatchSync();
+    $this->info('完成。');
+})->purpose('立即重算默认榜单（写入 ranking_entries）');
+
+/*
+| 每日 04:00 重算物化榜单（晚于 GitHub 同步，减少与 03:00 同步同批争用）。
+*/
+Schedule::job(new RebuildRankingJob)->dailyAt('04:00');
 // AI-GEN-END

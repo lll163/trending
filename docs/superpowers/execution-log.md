@@ -2,7 +2,7 @@
 
 本文档汇总仓库内已落地的实现步骤、运行环境要求、命令与 Git 历史，便于续开发与交接。
 
-**最后更新：** 2026-04-08（含 Chunk 6：GitHub 同步客户端与定时任务）  
+**最后更新：** 2026-04-08（含 Chunk 7：榜单与首页聚合）  
 **当前开发分支：** `feature/laravel-bootstrap`（已推送远程 `origin/feature/laravel-bootstrap`）
 
 ---
@@ -73,6 +73,14 @@
 
 **调度列表：** `php artisan schedule:list` 会探测互斥锁；若 `CACHE_STORE=database` 且数据库文件/表未就绪可能报错，可改用 `file`/`array` 或先 `migrate`。
 
+### Chunk 7：榜单与首页聚合
+
+- **配置：** `config/ranking.php`（`default_key`、`default_params.limit` / `min_updated_days`）；`.env` 可选 `RANKING_DEFAULT_KEY`。
+- **服务：** `App\Services\Ranking\RankingService::rebuild($rankingKey)` — 已发布仓库按 `stars_cnt`、`updated_at` 排序，写入 `ranking_entries` 并更新 `ranking_configs.last_computed_at`。
+- **任务：** `RebuildRankingJob`；`routes/console.php` 每日 **04:00** 调度（晚于 03:00 GitHub 同步）；命令 **`php artisan ranking:rebuild`** 手动重算默认键。
+- **前台：** `HomeController@index` → `GET /`（`home`），聚合榜单预览（无物化数据时按 Star 回退）、最新 `approved` 投稿、入口链接；`RankingController@index` → `GET /rankings`、`GET /rankings/{ranking_key}`；`resources/views/home.blade.php`、`rankings/index.blade.php`（`layouts.site`）；`public-nav` 增加「榜单」。
+- **测试：** `RankingRebuildAndHomeTest`；`tests/TestCase` sqlite 补丁增加 `ranking_configs`、`ranking_entries`。
+
 ---
 
 ## 3. 环境依赖
@@ -118,6 +126,9 @@ php artisan test tests/Unit
 # GitHub 快照批量同步（与定时任务相同逻辑；需配置 GITHUB_TOKEN 才真正拉 API）
 php artisan github:sync-repository-snapshots
 
+# 重算默认物化榜单（写入 ranking_entries）
+php artisan ranking:rebuild
+
 # 查看计划任务（需 cache/DB 就绪，见 Chunk 6 说明）
 php artisan schedule:list
 ```
@@ -139,7 +150,9 @@ php artisan schedule:list
 
 | 方法 | URI | 名称 | 说明 |
 |------|-----|------|------|
-| GET | `/` | — | 欢迎页 |
+| GET | `/` | home | 首页聚合（推荐仓库、最新收录、入口） |
+| GET | `/rankings` | rankings.index | 榜单（默认键） |
+| GET | `/rankings/{ranking_key}` | rankings.key | 指定键榜单 |
 | GET | `/register`、`POST /register` | register | 注册 |
 | GET | `/login`、`POST /login` | login | 登录 |
 | GET | `/dashboard` | dashboard | 需 `auth`、`verified` |
@@ -192,7 +205,7 @@ php artisan schedule:list
 
 ## 9. 后续计划（未实现）
 
-见 [实现计划](./plans/2026-04-08-hellogithub-like-implementation.md) **Chunk 7** 及之后：榜单与首页聚合等。
+见 [实现计划](./plans/2026-04-08-hellogithub-like-implementation.md) **Chunk 8** 及之后：观测与收尾等。
 
 ---
 
@@ -205,3 +218,4 @@ php artisan schedule:list
 | 2026-04-08 | 补充 Chunk 4：前台仓库列表与标签筛选、管理员标签/快照打标、相关测试与路由 |
 | 2026-04-08 | 补充 Chunk 5：月刊期号/文章后台、前台月刊与 Markdown 渲染、测试与路由 |
 | 2026-04-08 | 补充 Chunk 6：GitHub 客户端、快照同步 Job、console 调度与手动命令、单元测试 |
+| 2026-04-08 | 补充 Chunk 7：RankingService、RebuildRankingJob、首页与榜单页、ranking 配置与测试 |

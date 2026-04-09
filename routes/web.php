@@ -6,15 +6,21 @@ use App\Http\Controllers\Admin\ReposSnapshotController;
 use App\Http\Controllers\Admin\SubmissionReviewController;
 use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Auth\GitHubController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MagazineController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RankingController;
 use App\Http\Controllers\RepositoryController;
 use App\Http\Controllers\SubmissionController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// AI-GEN-BEGIN
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/rankings', [RankingController::class, 'index'])->name('rankings.index');
+Route::get('/rankings/{ranking_key}', [RankingController::class, 'index'])
+    ->where('ranking_key', '[a-z0-9_]+')
+    ->name('rankings.key');
+// AI-GEN-END
 
 // AI-GEN-BEGIN
 Route::get('/repositories', [RepositoryController::class, 'index'])->name('repositories.index');

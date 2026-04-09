@@ -163,6 +163,33 @@ abstract class TestCase extends BaseTestCase
                 $table->index('magazine_issue_id', 'idx_articles_magazine_issue_id');
             });
         }
+
+        // AI-GEN-BEGIN
+        if (! Schema::hasTable('ranking_configs')) {
+            Schema::create('ranking_configs', function (Blueprint $table) {
+                $table->id();
+                $table->string('ranking_key', 64);
+                $table->json('params_json')->nullable();
+                $table->dateTime('last_computed_at')->nullable();
+                $table->timestamps();
+                $table->unique('ranking_key', 'uniq_ranking_configs_key');
+            });
+        }
+
+        if (! Schema::hasTable('ranking_entries')) {
+            Schema::create('ranking_entries', function (Blueprint $table) {
+                $table->id();
+                $table->string('ranking_key', 64);
+                $table->unsignedBigInteger('repos_snapshot_id');
+                $table->unsignedInteger('position');
+                $table->decimal('score', 20, 6)->default(0);
+                $table->dateTime('computed_at');
+                $table->timestamps();
+                $table->unique(['ranking_key', 'position'], 'uniq_ranking_entries_key_position');
+                $table->index('ranking_key', 'idx_ranking_entries_key');
+                $table->index('repos_snapshot_id', 'idx_ranking_entries_repo');
+            });
+        }
         // AI-GEN-END
     }
     // AI-GEN-END
