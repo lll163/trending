@@ -4,6 +4,9 @@
         <div class="flex items-center gap-6">
             <a href="{{ url('/') }}" class="text-sm font-medium text-gray-700 hover:text-gray-900">{{ __('首页') }}</a>
             <a href="{{ route('repositories.index') }}" class="text-sm font-medium text-gray-700 hover:text-gray-900">{{ __('开源仓库') }}</a>
+            {{-- AI-GEN-BEGIN --}}
+            <a href="{{ route('magazines.index') }}" class="text-sm font-medium text-gray-700 hover:text-gray-900">{{ __('月刊') }}</a>
+            {{-- AI-GEN-END --}}
         </div>
         <div class="flex items-center gap-4 text-sm">
             @auth

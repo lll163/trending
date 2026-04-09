@@ -3,6 +3,9 @@
 namespace App\Models;
 
 // AI-GEN-BEGIN
+use Database\Factories\ArticleFactory;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -11,6 +14,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class Article extends Model
 {
+    /** @use HasFactory<ArticleFactory> */
+    use HasFactory;
+
     protected $table = 'articles';
 
     protected $fillable = [
@@ -36,6 +42,17 @@ class Article extends Model
     public function magazineIssue(): BelongsTo
     {
         return $this->belongsTo(MagazineIssue::class, 'magazine_issue_id');
+    }
+
+    /**
+     * 仅已发布文章（前台）。
+     *
+     * @param  Builder<Article>  $query
+     * @return Builder<Article>
+     */
+    public function scopePublished($query)
+    {
+        return $query->where('status', 'published');
     }
 }
 // AI-GEN-END

@@ -3,6 +3,9 @@
 namespace App\Models;
 
 // AI-GEN-BEGIN
+use Database\Factories\MagazineIssueFactory;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -11,7 +14,18 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class MagazineIssue extends Model
 {
+    /** @use HasFactory<MagazineIssueFactory> */
+    use HasFactory;
+
     protected $table = 'magazine_issues';
+
+    /**
+     * 前台路由使用期号 `issue_code` 解析模型。
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'issue_code';
+    }
 
     protected $fillable = [
         'issue_code',
@@ -38,6 +52,17 @@ class MagazineIssue extends Model
     public function articles(): HasMany
     {
         return $this->hasMany(Article::class, 'magazine_issue_id');
+    }
+
+    /**
+     * 仅已发布期号（前台）。
+     *
+     * @param  Builder<MagazineIssue>  $query
+     * @return Builder<MagazineIssue>
+     */
+    public function scopePublished($query)
+    {
+        return $query->where('status', 'published');
     }
 }
 // AI-GEN-END

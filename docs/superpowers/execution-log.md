@@ -2,7 +2,7 @@
 
 本文档汇总仓库内已落地的实现步骤、运行环境要求、命令与 Git 历史，便于续开发与交接。
 
-**最后更新：** 2026-04-08（含 Chunk 4：仓库列表/标签/快照打标）  
+**最后更新：** 2026-04-08（含 Chunk 5：月刊与文章）  
 **当前开发分支：** `feature/laravel-bootstrap`（已推送远程 `origin/feature/laravel-bootstrap`）
 
 ---
@@ -52,6 +52,15 @@
 - **视图：** `repositories/index|show`；`admin/tags/*`；`admin/repos_snapshots/*`；欢迎页与 Breeze 导航增加「开源仓库」/ 管理员「标签」「仓库快照」入口。
 - **工厂：** `TagFactory`；`Tag` 模型启用 `HasFactory`。
 - **测试：** `RepositoryAndTagAdminTest`（列表仅已发布、`?tag=` 筛选、详情大小写、管理员同步标签、非管理员禁止）；`tests/TestCase` 在 sqlite 下补充 `tags`、`repo_tag` 表。
+
+### Chunk 5：月刊与文章
+
+- **后台：** `Admin\MagazineIssueController`、`Admin\ArticleController`（resource，无 show）；期号支持可选封面上传至 `storage/app/public/magazine-covers`，库内仅存相对路径；删除期内有文章时禁止删期号；文章 Markdown 存 `articles.body`，`sort_order` 排序。
+- **前台：** `MagazineController` — `GET /magazines`、`GET /magazines/{issue_code}`（目录）、`GET /magazines/{issue_code}/{article_slug}`（正文）；仅 `status=published` 可见；正文经 `App\Support\ArticleBodyHtml::fromMarkdown`（`html_input` = strip）渲染。
+- **导航：** 公共 `public-nav`「月刊」；管理员「月刊期号」「文章」。
+- **测试：** `MagazinePublicFlowTest`（一期两文、草稿隐藏、后台权限）；`ArticleBodyHtmlTest`（剥离原始 HTML）；`tests/TestCase` 在 sqlite 下补充 `magazine_issues`、`articles`；若配置了 sqlite 但未加载 **pdo_sqlite**，则跳过业务表补丁，便于在无驱动环境跑部分 Unit 测试。
+
+**封面访问：** 部署后执行 `php artisan storage:link`，封面 URL 为 `asset('storage/'.$cover_path)`。
 
 ---
 
@@ -133,6 +142,11 @@ php artisan test tests/Unit
 | GET | `/admin/repos-snapshots` | admin.repos-snapshots.index | 快照列表（管理员） |
 | GET | `/admin/repos-snapshots/{id}/tags` | admin.repos-snapshots.edit-tags | 编辑快照标签 |
 | PUT | `/admin/repos-snapshots/{id}/tags` | admin.repos-snapshots.update-tags | 保存快照标签 |
+| GET | `/magazines` | magazines.index | 月刊列表（公开） |
+| GET | `/magazines/{issue_code}` | magazines.show | 期号目录（公开） |
+| GET | `/magazines/{issue_code}/{article_slug}` | magazines.article | 文章阅读（公开） |
+| GET 等 | `/admin/magazine-issues` | admin.magazine-issues.* | 月刊期号 CRUD（管理员） |
+| GET 等 | `/admin/articles` | admin.articles.* | 文章 CRUD（管理员） |
 
 ---
 
@@ -161,7 +175,7 @@ php artisan test tests/Unit
 
 ## 9. 后续计划（未实现）
 
-见 [实现计划](./plans/2026-04-08-hellogithub-like-implementation.md) **Chunk 5** 及之后：月刊、GitHub 定时同步、榜单等。
+见 [实现计划](./plans/2026-04-08-hellogithub-like-implementation.md) **Chunk 6** 及之后：GitHub 定时同步、榜单等。
 
 ---
 
@@ -172,3 +186,4 @@ php artisan test tests/Unit
 | 2026-04-09 | 初版：汇总 Chunk 1～2 执行信息、环境与 Git |
 | 2026-04-09 | 补充 Chunk 3：自动规则、投稿 CRUD、Blade 后台审核、测试与路由 |
 | 2026-04-08 | 补充 Chunk 4：前台仓库列表与标签筛选、管理员标签/快照打标、相关测试与路由 |
+| 2026-04-08 | 补充 Chunk 5：月刊期号/文章后台、前台月刊与 Markdown 渲染、测试与路由 |

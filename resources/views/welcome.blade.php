@@ -24,12 +24,20 @@
             @if (Route::has('login'))
                 <nav class="flex items-center justify-end gap-4">
                     {{-- AI-GEN-BEGIN --}}
-                    <a
-                        href="{{ route('repositories.index') }}"
-                        class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] text-[#1b1b18] border border-transparent hover:border-[#19140035] dark:hover:border-[#3E3E3A] rounded-sm text-sm leading-normal me-auto"
-                    >
-                        {{ __('开源仓库') }}
-                    </a>
+                    <div class="flex flex-wrap items-center gap-2 me-auto">
+                        <a
+                            href="{{ route('repositories.index') }}"
+                            class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] text-[#1b1b18] border border-transparent hover:border-[#19140035] dark:hover:border-[#3E3E3A] rounded-sm text-sm leading-normal"
+                        >
+                            {{ __('开源仓库') }}
+                        </a>
+                        <a
+                            href="{{ route('magazines.index') }}"
+                            class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] text-[#1b1b18] border border-transparent hover:border-[#19140035] dark:hover:border-[#3E3E3A] rounded-sm text-sm leading-normal"
+                        >
+                            {{ __('月刊') }}
+                        </a>
+                    </div>
                     {{-- AI-GEN-END --}}
                     @auth
                         <a

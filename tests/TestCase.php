@@ -22,6 +22,11 @@ abstract class TestCase extends BaseTestCase
             return;
         }
 
+        // 未启用 pdo_sqlite 时不访问数据库，避免 setUp 阶段即失败（部分 Unit 测试无需库）。
+        if (! extension_loaded('pdo_sqlite')) {
+            return;
+        }
+
         if (! Schema::hasTable('users')) {
             return;
         }
@@ -127,6 +132,38 @@ abstract class TestCase extends BaseTestCase
                 $table->timestamps();
             });
         }
+
+        // AI-GEN-BEGIN
+        if (! Schema::hasTable('magazine_issues')) {
+            Schema::create('magazine_issues', function (Blueprint $table) {
+                $table->id();
+                $table->string('issue_code', 32);
+                $table->string('title', 255);
+                $table->string('cover_path', 512)->nullable();
+                $table->json('catalog_json')->nullable();
+                $table->string('status', 32)->default('draft');
+                $table->dateTime('published_at')->nullable();
+                $table->timestamps();
+                $table->unique('issue_code', 'uniq_magazine_issues_issue_code');
+            });
+        }
+
+        if (! Schema::hasTable('articles')) {
+            Schema::create('articles', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('magazine_issue_id')->nullable();
+                $table->string('slug', 255);
+                $table->string('title', 255);
+                $table->longText('body');
+                $table->integer('sort_order')->default(0);
+                $table->string('status', 32)->default('draft');
+                $table->dateTime('published_at')->nullable();
+                $table->timestamps();
+                $table->unique('slug', 'uniq_articles_slug');
+                $table->index('magazine_issue_id', 'idx_articles_magazine_issue_id');
+            });
+        }
+        // AI-GEN-END
     }
     // AI-GEN-END
 }

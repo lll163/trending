@@ -204,11 +204,11 @@
 - Create: `app/Http/Controllers/Admin/MagazineIssueController.php`、`ArticleController.php` 或 Filament Resources
 - Create: `resources/views/magazines/*.blade.php`（前台）
 
-- [ ] **Step 1：** 后台：创建期号、排序、封面图路径或上传策略（仅存路径字符串，文件存储用 `storage/app/public` 并 `php artisan storage:link`）。
-- [ ] **Step 2：** 文章正文：Markdown 存库 + 前台 `Str::markdown` 或等价渲染（安全过滤 XSS）。
-- [ ] **Step 3：** 前台：期号列表 → 期详情目录 → 文章阅读页。
-- [ ] **Step 4：** Feature 测试：发布一期含两篇文章可读。
-- [ ] **Step 5：** 提交：`feat: 月刊与文章（后台+前台）`。
+- [x] **Step 1：** 后台：创建期号、排序、封面图路径或上传策略（仅存路径字符串，文件存储用 `storage/app/public` 并 `php artisan storage:link`）。
+- [x] **Step 2：** 文章正文：Markdown 存库 + 前台 `Str::markdown` 或等价渲染（安全过滤 XSS）。
+- [x] **Step 3：** 前台：期号列表 → 期详情目录 → 文章阅读页。
+- [x] **Step 4：** Feature 测试：发布一期含两篇文章可读。
+- [x] **Step 5：** 提交：`feat: 月刊与文章（后台+前台）`。
 
 ---
 
