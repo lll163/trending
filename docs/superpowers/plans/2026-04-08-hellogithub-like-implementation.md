@@ -178,10 +178,10 @@
 - Create: `app/Http/Controllers/Admin/TagController.php` 或 Filament Resource
 - Create: 前台 `app/Http/Controllers/RepositoryController.php`（列表筛选 `tag` 查询参数）
 
-- [ ] **Step 1：** 后台维护标签 CRUD；仓库快照与标签可编辑关联（至少后台）。
-- [ ] **Step 2：** 前台列表支持按标签过滤。
-- [ ] **Step 3：** Feature 测试：筛选 URL 与结果条数断言。
-- [ ] **Step 4：** 提交：`feat: 标签管理与前台筛选`。
+- [x] **Step 1：** 后台维护标签 CRUD；仓库快照与标签可编辑关联（至少后台）。
+- [x] **Step 2：** 前台列表支持按标签过滤。
+- [x] **Step 3：** Feature 测试：筛选 URL 与结果条数断言。
+- [x] **Step 4：** 提交：`feat: 标签管理与前台筛选`。
 
 ### Task 4.2：仓库详情与列表 Blade
 
@@ -190,8 +190,8 @@
 - Create: `resources/views/repositories/index.blade.php`、`show.blade.php`
 - Modify: `routes/web.php`
 
-- [ ] **Step 1：** 列表分页、详情展示快照字段（来自本地库，不实时打 GitHub）。
-- [ ] **Step 2：** 提交：`feat: 仓库列表与详情页（Blade）`。
+- [x] **Step 1：** 列表分页、详情展示快照字段（来自本地库，不实时打 GitHub）。
+- [x] **Step 2：** 提交：`feat: 仓库列表与详情页（Blade）`。
 
 ---
 
