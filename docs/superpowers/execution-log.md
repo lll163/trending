@@ -2,7 +2,7 @@
 
 本文档汇总仓库内已落地的实现步骤、运行环境要求、命令与 Git 历史，便于续开发与交接。
 
-**最后更新：** 2026-04-09（含 Chunk 3）  
+**最后更新：** 2026-04-08（含 Chunk 4：仓库列表/标签/快照打标）  
 **当前开发分支：** `feature/laravel-bootstrap`（已推送远程 `origin/feature/laravel-bootstrap`）
 
 ---
@@ -44,6 +44,14 @@
 - **管理侧（方案 B）：** 中间件 `admin`（`EnsureUserIsAdmin`）；`Admin\SubmissionReviewController`；路由前缀 `/admin/submissions`；通过时 `firstOrCreate` `repos_snapshots` 并写 `review_logs`；驳回时 `rejected_review` + 原因。
 - **策略：** `SubmissionPolicy` 增加 `viewAny`、`view`。
 - **测试：** `tests/Unit/SubmissionAutoRulesTest`（纯 PHPUnit，无 DB）；`SubmissionStoreFlowTest`、`AdminSubmissionReviewTest`；`tests/TestCase` 在 sqlite 下补充 `repos_snapshots`、`submissions`、`review_logs`、`blacklist_entries` 表（无 `users` 表时不执行补丁，避免纯单元测试连库）。
+
+### Chunk 4：前台仓库列表、标签与快照打标
+
+- **前台布局：** `layouts/site`、`partials/public-nav`；`GET /repositories` 分页列表，支持 `?tag=slug`；`GET /repositories/{owner}/{repo}` 详情（仅 `is_published=true`，owner/repo 小写匹配）。
+- **控制器：** `RepositoryController`；`Admin\TagController`（resource，无 show）；`Admin\ReposSnapshotController`（快照列表检索、`editTags` / `updateTags` 同步 `repo_tag`）。
+- **视图：** `repositories/index|show`；`admin/tags/*`；`admin/repos_snapshots/*`；欢迎页与 Breeze 导航增加「开源仓库」/ 管理员「标签」「仓库快照」入口。
+- **工厂：** `TagFactory`；`Tag` 模型启用 `HasFactory`。
+- **测试：** `RepositoryAndTagAdminTest`（列表仅已发布、`?tag=` 筛选、详情大小写、管理员同步标签、非管理员禁止）；`tests/TestCase` 在 sqlite 下补充 `tags`、`repo_tag` 表。
 
 ---
 
@@ -119,6 +127,12 @@ php artisan test tests/Unit
 | GET | `/admin/submissions/{id}` | admin.submissions.show | 单条审核 |
 | POST | `/admin/submissions/{id}/approve` | admin.submissions.approve | 通过 |
 | POST | `/admin/submissions/{id}/reject` | admin.submissions.reject | 驳回（需 remark） |
+| GET | `/repositories` | repositories.index | 开源仓库列表（公开） |
+| GET | `/repositories/{owner}/{repo}` | repositories.show | 仓库详情（公开） |
+| GET/POST 等 | `/admin/tags` | admin.tags.* | 标签 CRUD（管理员） |
+| GET | `/admin/repos-snapshots` | admin.repos-snapshots.index | 快照列表（管理员） |
+| GET | `/admin/repos-snapshots/{id}/tags` | admin.repos-snapshots.edit-tags | 编辑快照标签 |
+| PUT | `/admin/repos-snapshots/{id}/tags` | admin.repos-snapshots.update-tags | 保存快照标签 |
 
 ---
 
@@ -147,7 +161,7 @@ php artisan test tests/Unit
 
 ## 9. 后续计划（未实现）
 
-见 [实现计划](./plans/2026-04-08-hellogithub-like-implementation.md) **Chunk 4** 及之后：标签与前台仓库列表、月刊、GitHub 定时同步、榜单等。
+见 [实现计划](./plans/2026-04-08-hellogithub-like-implementation.md) **Chunk 5** 及之后：月刊、GitHub 定时同步、榜单等。
 
 ---
 
@@ -157,3 +171,4 @@ php artisan test tests/Unit
 |------|------|
 | 2026-04-09 | 初版：汇总 Chunk 1～2 执行信息、环境与 Git |
 | 2026-04-09 | 补充 Chunk 3：自动规则、投稿 CRUD、Blade 后台审核、测试与路由 |
+| 2026-04-08 | 补充 Chunk 4：前台仓库列表与标签筛选、管理员标签/快照打标、相关测试与路由 |

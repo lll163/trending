@@ -71,6 +71,29 @@ abstract class TestCase extends BaseTestCase
             });
         }
 
+        // AI-GEN-BEGIN
+        if (! Schema::hasTable('tags')) {
+            Schema::create('tags', function (Blueprint $table) {
+                $table->id();
+                $table->string('slug', 128);
+                $table->string('title', 255);
+                $table->timestamps();
+                $table->unique('slug', 'uniq_tags_slug');
+            });
+        }
+
+        if (! Schema::hasTable('repo_tag')) {
+            Schema::create('repo_tag', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('repos_snapshot_id');
+                $table->unsignedBigInteger('tag_id');
+                $table->timestamps();
+                $table->unique(['repos_snapshot_id', 'tag_id'], 'uniq_repo_tag_pair');
+                $table->index('tag_id', 'idx_repo_tag_tag_id');
+            });
+        }
+        // AI-GEN-END
+
         if (! Schema::hasTable('submissions')) {
             Schema::create('submissions', function (Blueprint $table) {
                 $table->id();

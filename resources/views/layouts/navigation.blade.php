@@ -28,6 +28,14 @@
                         <x-nav-link :href="route('admin.submissions.index')" :active="request()->routeIs('admin.submissions.*')">
                             {{ __('审核队列') }}
                         </x-nav-link>
+                        {{-- AI-GEN-BEGIN --}}
+                        <x-nav-link :href="route('admin.tags.index')" :active="request()->routeIs('admin.tags.*')">
+                            {{ __('标签') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('admin.repos-snapshots.index')" :active="request()->routeIs('admin.repos-snapshots.*')">
+                            {{ __('仓库快照') }}
+                        </x-nav-link>
+                        {{-- AI-GEN-END --}}
                     @endif
                     {{-- AI-GEN-END --}}
                 </div>
@@ -98,6 +106,14 @@
                 <x-responsive-nav-link :href="route('admin.submissions.index')" :active="request()->routeIs('admin.submissions.*')">
                     {{ __('审核队列') }}
                 </x-responsive-nav-link>
+                {{-- AI-GEN-BEGIN --}}
+                <x-responsive-nav-link :href="route('admin.tags.index')" :active="request()->routeIs('admin.tags.*')">
+                    {{ __('标签') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('admin.repos-snapshots.index')" :active="request()->routeIs('admin.repos-snapshots.*')">
+                    {{ __('仓库快照') }}
+                </x-responsive-nav-link>
+                {{-- AI-GEN-END --}}
             @endif
             {{-- AI-GEN-END --}}
         </div>
