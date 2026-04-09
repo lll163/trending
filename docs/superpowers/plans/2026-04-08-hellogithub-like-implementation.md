@@ -221,10 +221,10 @@
 - Create: `app/Services/GitHub/GitHubRepositoryClient.php`
 - Create: `tests/Unit/GitHubRepositoryClientTest.php`
 
-- [ ] **Step 1：** 封装「根据 `owner/repo` 拉取仓库信息」方法，映射到快照表字段。
-- [ ] **Step 2：** 当 `GITHUB_TOKEN` 为空时，客户端返回明确「跳过」类型，不抛未捕获异常（由调用方记日志）。
-- [ ] **Step 3：** 单元测试使用 `Http::fake` 模拟 200/404/403。
-- [ ] **Step 4：** 提交：`feat: GitHub 仓库元数据客户端`。
+- [x] **Step 1：** 封装「根据 `owner/repo` 拉取仓库信息」方法，映射到快照表字段。
+- [x] **Step 2：** 当 `GITHUB_TOKEN` 为空时，客户端返回明确「跳过」类型，不抛未捕获异常（由调用方记日志）。
+- [x] **Step 3：** 单元测试使用 `Http::fake` 模拟 200/404/403。
+- [x] **Step 4：** 提交：`feat: GitHub 仓库元数据客户端`。
 
 ### Task 6.2：队列任务与调度
 
@@ -233,10 +233,10 @@
 - Create: `app/Jobs/SyncRepositorySnapshotJob.php`、`SyncAllRepositoriesJob.php`（或批量调度类）
 - Modify: `routes/console.php`（`Schedule::` 注册）
 
-- [ ] **Step 1：** 任务内逐条更新，单条失败写快照表错误字段并继续。
-- [ ] **Step 2：** 配置 `schedule`：例如每日一次同步全部已发布仓库（具体 cron 写在 `routes/console.php` 注释）。
-- [ ] **Step 3：** 本地运行 `php artisan schedule:test` 或手动 `dispatch` 验证一条。
-- [ ] **Step 4：** 提交：`feat: 定时批量同步 GitHub 元数据`。
+- [x] **Step 1：** 任务内逐条更新，单条失败写快照表错误字段并继续。
+- [x] **Step 2：** 配置 `schedule`：例如每日一次同步全部已发布仓库（具体 cron 写在 `routes/console.php` 注释）。
+- [x] **Step 3：** 本地运行 `php artisan schedule:test` 或手动 `dispatch` 验证一条。
+- [x] **Step 4：** 提交：`feat: 定时批量同步 GitHub 元数据`。
 
 ---
 

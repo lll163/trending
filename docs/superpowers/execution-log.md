@@ -2,7 +2,7 @@
 
 本文档汇总仓库内已落地的实现步骤、运行环境要求、命令与 Git 历史，便于续开发与交接。
 
-**最后更新：** 2026-04-08（含 Chunk 5：月刊与文章）  
+**最后更新：** 2026-04-08（含 Chunk 6：GitHub 同步客户端与定时任务）  
 **当前开发分支：** `feature/laravel-bootstrap`（已推送远程 `origin/feature/laravel-bootstrap`）
 
 ---
@@ -62,6 +62,17 @@
 
 **封面访问：** 部署后执行 `php artisan storage:link`，封面 URL 为 `asset('storage/'.$cover_path)`。
 
+### Chunk 6：GitHub 定时同步
+
+- **客户端：** `App\Services\GitHub\GitHubRepositoryClient`（`GET /repos/{owner}/{repo}`，映射 `description`、`stars_cnt`、`forks_cnt`、`default_branch`、`homepage_url`、`pushed_at`）；`GitHubRepositoryFetchResult` + `GitHubRepositoryFetchStatus`；`GITHUB_TOKEN` 为空时返回 **Skipped**，不发起 HTTP。
+- **写库：** `RepositorySnapshotGitHubSync` 根据结果更新单条 `repos_snapshots`（成功则写 `snapshot_synced_at` 并清空 `snapshot_sync_error`；失败只写错误文案并打 `Log::warning`；跳过只打 `Log::info`）。
+- **任务：** `SyncRepositorySnapshotJob`（单条）、`SyncAllRepositoriesJob`（`is_published=true` 逐条 `dispatchSync` 子任务，单条异常捕获写库）。
+- **调度：** `routes/console.php` 注册每日 `03:00` 的 `SyncAllRepositoriesJob`；命令 `php artisan github:sync-repository-snapshots` 手动跑一批。
+- **容器：** `AppServiceProvider` 注册 `GitHubRepositoryClient`、`RepositorySnapshotGitHubSync` 单例。
+- **测试：** `tests/Unit/GitHubRepositoryClientTest`（Http::fake：空 Token、200、404、403）。
+
+**调度列表：** `php artisan schedule:list` 会探测互斥锁；若 `CACHE_STORE=database` 且数据库文件/表未就绪可能报错，可改用 `file`/`array` 或先 `migrate`。
+
 ---
 
 ## 3. 环境依赖
@@ -103,6 +114,12 @@ php artisan migrate
 # 测试（需启用 pdo_sqlite，或自行改 phpunit 使用 MySQL 测试库）
 php artisan test
 php artisan test tests/Unit
+
+# GitHub 快照批量同步（与定时任务相同逻辑；需配置 GITHUB_TOKEN 才真正拉 API）
+php artisan github:sync-repository-snapshots
+
+# 查看计划任务（需 cache/DB 就绪，见 Chunk 6 说明）
+php artisan schedule:list
 ```
 
 ---
@@ -113,7 +130,7 @@ php artisan test tests/Unit
 
 - `GITHUB_CLIENT_ID`、`GITHUB_CLIENT_SECRET`
 - `GITHUB_REDIRECT_URI`：须与 GitHub OAuth App 回调一致，例如 `{APP_URL}/auth/github/callback`
-- `GITHUB_TOKEN`：后续定时同步 GitHub API 使用（可暂空）
+- `GITHUB_TOKEN`：GitHub REST 同步（`GitHubRepositoryClient`）；为空则跳过同步并记日志，不抛异常
 - `SUBMISSION_BLOCKED_KEYWORDS`：可选，逗号分隔；留空则用 `config/submission.php` 默认关键词列表
 
 ---
@@ -175,7 +192,7 @@ php artisan test tests/Unit
 
 ## 9. 后续计划（未实现）
 
-见 [实现计划](./plans/2026-04-08-hellogithub-like-implementation.md) **Chunk 6** 及之后：GitHub 定时同步、榜单等。
+见 [实现计划](./plans/2026-04-08-hellogithub-like-implementation.md) **Chunk 7** 及之后：榜单与首页聚合等。
 
 ---
 
@@ -187,3 +204,4 @@ php artisan test tests/Unit
 | 2026-04-09 | 补充 Chunk 3：自动规则、投稿 CRUD、Blade 后台审核、测试与路由 |
 | 2026-04-08 | 补充 Chunk 4：前台仓库列表与标签筛选、管理员标签/快照打标、相关测试与路由 |
 | 2026-04-08 | 补充 Chunk 5：月刊期号/文章后台、前台月刊与 Markdown 渲染、测试与路由 |
+| 2026-04-08 | 补充 Chunk 6：GitHub 客户端、快照同步 Job、console 调度与手动命令、单元测试 |
